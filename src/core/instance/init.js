@@ -18,6 +18,12 @@ export function initMixin (Vue: Class<Component>) {
     // a uid
     vm._uid = uid++
 
+    /**
+     * annatation 2
+     * 
+     * 在开发者模式下，利用 window.performace 来记录每一个组件实例的性能表现
+     * 在 vue-devtool 中可以看到每个组件的各个生命周期所耗费的时间
+     */
     let startTag, endTag
     /* istanbul ignore if */
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
