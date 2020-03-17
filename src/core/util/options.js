@@ -394,14 +394,31 @@ export function mergeOptions (
     checkComponents(child)
   }
 
+  /**
+   * TODO
+   * 
+   * 什么情况下 Vue 的配置参数对象为函数？
+   */
   if (typeof child === 'function') {
     child = child.options
   }
-
+  /**
+   * 标准化 props / inject / directives
+   * 
+   * 标准化的内容包括：名称驼峰化，数据格式标准化
+  */
   normalizeProps(child, vm)
   normalizeInject(child, vm)
   normalizeDirectives(child)
 
+  /**
+   * 合并配置参数中的 extends 和 mixins
+   * 
+   * _base 属性是构造函数 Vue.options 的一个属性，如果该属性存在，则表示 child options 是 mergeOptions 的执行结果
+   * child.extends 是 Vue.extend 的一种变化实现，主要是为了便于扩展单文件组件
+   * 
+   * TODO 什么情况下 child options 是 mergeOptions 的执行结果？为啥不能合并？
+   */
   // Apply extends and mixins on the child options,
   // but only if it is a raw options object that isn't
   // the result of another mergeOptions call.
@@ -417,6 +434,11 @@ export function mergeOptions (
     }
   }
 
+  /**
+   * 继承 + 合并 options
+   * 
+   * 继承了 parent options，合并同名 options
+   */
   const options = {}
   let key
   for (key in parent) {
