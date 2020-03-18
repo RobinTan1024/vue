@@ -75,6 +75,13 @@ if (process.env.NODE_ENV !== 'production') {
     }
   }
 
+  /**
+   * 实例属性访问检查
+   * 
+   * 如果属性不存在或者为保留内部属性，则发出警告
+   * 
+   * TODO options.render._withStripped 是什么属性？
+   */
   initProxy = function initProxy (vm) {
     if (hasProxy) {
       // determine which proxy handler to use

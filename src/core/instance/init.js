@@ -38,7 +38,9 @@ export function initMixin (Vue: Class<Component>) {
     /**
      * 合并构造函数与组件的配置项
      * 
-     * TODO vm.$options 是拿来干啥的？？
+     * 构造函数包括 Vue 和通过 Vue.extend 拓展的子构造函数（子类）
+     * _isComponent 属性是内部组件如 vnode 的属性
+     * 
      */
     // merge options
     if (options && options._isComponent) {
@@ -53,15 +55,22 @@ export function initMixin (Vue: Class<Component>) {
         vm
       )
     }
+
+    /**
+     * 对不存在属性和内部属性的访问警告
+     * 
+     * TODO _renderProxy的作用是什么？
+     */
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
       initProxy(vm)
     } else {
       vm._renderProxy = vm
     }
+    
     // expose real self
     vm._self = vm
-    initLifecycle(vm)
+    initLifecycle(vm) // 建立组件树关系
     initEvents(vm)
     initRender(vm)
     callHook(vm, 'beforeCreate')
