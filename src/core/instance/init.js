@@ -71,7 +71,7 @@ export function initMixin (Vue: Class<Component>) {
     // expose real self
     vm._self = vm
     initLifecycle(vm) // 建立组件树关系
-    initEvents(vm)
+    initEvents(vm) // 实例事件函数：1.把 this 绑定为 vm；2.捕获函数或者 Promise 中的运行时异常；3.实现组件树的事件冒泡
     initRender(vm)
     callHook(vm, 'beforeCreate')
     initInjections(vm) // resolve injections before data/props

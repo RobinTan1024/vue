@@ -62,7 +62,7 @@ export function updateListeners (
   for (name in on) {
     def = cur = on[name]
     old = oldOn[name]
-    event = normalizeEvent(name)
+    event = normalizeEvent(name) // 标准化事件修饰符
     /* istanbul ignore if */
     if (__WEEX__ && isPlainObject(def)) {
       cur = def.handler
@@ -74,18 +74,32 @@ export function updateListeners (
         vm
       )
     } else if (isUndef(old)) {
+      /**
+       * 方法函数的处理，包括：
+       * 1. 函数中的 this 绑定为 vm
+       * 2. 函数或者 Promsie 运行时错误的捕获
+       */
       if (isUndef(cur.fns)) {
-        cur = on[name] = createFnInvoker(cur, vm)
+        cur = on[name] = createFnInvoker(cur, vm) // 将函数中的 this 绑定为 vm
       }
+      /* 把函数变为一次性的 */
       if (isTrue(event.once)) {
         cur = on[name] = createOnceHandler(event.name, cur, event.capture)
       }
+      /* 将函数绑定为事件 */
       add(event.name, cur, event.capture, event.passive, event.params)
     } else if (cur !== old) {
+      /**
+       * 在此条件下，parentListeners 中有一个与当前组件同名的事件
+       * 
+       * TODO 但是为什么要执行以下2条语句？
+       * old 是 createFnInvoker 返回的闭包函数，其 vm 也是得到 old 的时候的 vm，不是当前 vm ，所以把它赋值给 on[name] 的意义？？
+       */
       old.fns = cur
       on[name] = old
     }
   }
+  /* 只保留同名的，用于事件冒泡。不同名的不需要 */
   for (name in oldOn) {
     if (isUndef(on[name])) {
       event = normalizeEvent(name)

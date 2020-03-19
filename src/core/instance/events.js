@@ -12,6 +12,10 @@ import { updateListeners } from '../vdom/helpers/index'
 export function initEvents (vm: Component) {
   vm._events = Object.create(null)
   vm._hasHookEvent = false
+  /**
+   * TODO vm.$options._parentListeners 是从哪里来的？为什么要和 vm 合并处理？
+   * 来源是 vnodeComponentOptions.listeners
+   */
   // init parent attached events
   const listeners = vm.$options._parentListeners
   if (listeners) {
@@ -58,6 +62,7 @@ export function eventsMixin (Vue: Class<Component>) {
         vm.$on(event[i], fn)
       }
     } else {
+      /* vm._events 是用于存储事件 kv 的对象 */
       (vm._events[event] || (vm._events[event] = [])).push(fn)
       // optimize hook:event cost by using a boolean flag marked at registration
       // instead of a hash lookup
