@@ -44,11 +44,12 @@ export function resolveInject (inject: any, vm: Component): ?Object {
       ? Reflect.ownKeys(inject)
       : Object.keys(inject)
 
+    /* 沿着组件树向上查找 provide injection 的源头 */
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i]
       // #6574 in case the inject object is observed...
       if (key === '__ob__') continue
-      const provideKey = inject[key].from
+      const provideKey = inject[key].from // provideKey 等于 inject name
       let source = vm
       while (source) {
         if (source._provided && hasOwn(source._provided, provideKey)) {
@@ -57,6 +58,7 @@ export function resolveInject (inject: any, vm: Component): ?Object {
         }
         source = source.$parent
       }
+      /* 找不到依赖注入的提供者，采用默认值 */
       if (!source) {
         if ('default' in inject[key]) {
           const provideDefault = inject[key].default

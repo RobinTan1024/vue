@@ -36,7 +36,9 @@ export function initMixin (Vue: Class<Component>) {
     vm._isVue = true
 
     /**
-     * 合并构造函数与组件的配置项
+     * 标准化并且合并构造函数与组件的配置项
+     * 
+     * 标准化的内容包括：名称驼峰化，数据格式标准化。标准化的对象是 props / inject / directives
      * 
      * 构造函数包括 Vue 和通过 Vue.extend 拓展的子构造函数（子类）
      * _isComponent 属性是内部组件如 vnode 的属性
@@ -72,10 +74,10 @@ export function initMixin (Vue: Class<Component>) {
     vm._self = vm
     initLifecycle(vm) // 建立组件树关系
     initEvents(vm) // 实例事件函数：1.把 this 绑定为 vm；2.捕获函数或者 Promise 中的运行时异常；3.实现组件树的事件冒泡
-    initRender(vm)
+    initRender(vm) // 处理 slot，响应式 vm.$attrs 和 vm.$listeners
     callHook(vm, 'beforeCreate')
-    initInjections(vm) // resolve injections before data/props
-    initState(vm)
+    initInjections(vm) // resolve injections before data/props 翻译：在 data/props 前沿着组件树找到依赖注入
+    initState(vm) // 处理
     initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
 

@@ -62,6 +62,7 @@ export function initState (vm: Component) {
 }
 
 function initProps (vm: Component, propsOptions: Object) {
+  /* propsData 是 vm 父组件传递的值对象 */
   const propsData = vm.$options.propsData || {}
   const props = vm._props = {}
   // cache prop keys so that future props updates can iterate using Array
@@ -74,6 +75,7 @@ function initProps (vm: Component, propsOptions: Object) {
   }
   for (const key in propsOptions) {
     keys.push(key)
+    /* validateProp 对 prop 进行了类型校验，初始化初值 */
     const value = validateProp(key, propsOptions, propsData, vm)
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
@@ -97,6 +99,8 @@ function initProps (vm: Component, propsOptions: Object) {
         }
       })
     } else {
+      /* 使 props 具有数据订阅能力 */
+      /* 在 validateProp 中 prop 的工厂函数返回的初始值已经具有数据订阅能力 */
       defineReactive(props, key, value)
     }
     // static props are already proxied on the component's prototype

@@ -24,23 +24,31 @@ export function validateProp (
   propsData: Object,
   vm?: Component
 ): any {
+  /* 经过 mergeOptions 后，prop 的数据格式是 { type: val } */
   const prop = propOptions[key]
+  /* vm 有没有得到 prop 传值 */
   const absent = !hasOwn(propsData, key)
   let value = propsData[key]
+  /* casting = 类型转换，布尔值转换 */
   // boolean casting
   const booleanIndex = getTypeIndex(Boolean, prop.type)
+  /* 如果 prop 的类型（之一）是布尔值 */
   if (booleanIndex > -1) {
     if (absent && !hasOwn(prop, 'default')) {
+      /* 当没有设置 propsData 和默认值时，其值为 false */
       value = false
     } else if (value === '' || value === hyphenate(key)) {
       // only cast empty string / same name to boolean if
       // boolean has higher priority
+      /* 当 prop 在 propsData 中的值为空字符串，或者 prop 在 propsData 中的值等于 propName 的连字符形式 */
+      /* 并且布尔值优先级更高时，其值为 true */
       const stringIndex = getTypeIndex(String, prop.type)
       if (stringIndex < 0 || booleanIndex < stringIndex) {
         value = true
       }
     }
   }
+  /* 不符合上述情况时，就需要给 prop 一个默认值。如果是工厂函数返回的默认值，则使其具有数据订阅能力 */
   // check default value
   if (value === undefined) {
     value = getPropDefaultValue(vm, prop, key)
@@ -51,6 +59,7 @@ export function validateProp (
     observe(value)
     toggleObserving(prevShouldObserve)
   }
+  /* 开发者模式下，断言 prop 是否得到规范使用，没有则发出警告 */
   if (
     process.env.NODE_ENV !== 'production' &&
     // skip validation for weex recycle-list child component props
@@ -79,6 +88,7 @@ function getPropDefaultValue (vm: ?Component, prop: PropOptions, key: string): a
       vm
     )
   }
+  /* TODO vm._props 定义与作用？？？ */
   // the raw prop value was also undefined from previous render,
   // return previous default value to avoid unnecessary watcher trigger
   if (vm && vm.$options.propsData &&
@@ -87,6 +97,7 @@ function getPropDefaultValue (vm: ?Component, prop: PropOptions, key: string): a
   ) {
     return vm._props[key]
   }
+  /* 获取调用工厂函数得到的值 */
   // call factory function for non-Function types
   // a value is Function if its prototype is function even across different execution context
   return typeof def === 'function' && getType(prop.type) !== 'Function'
@@ -189,6 +200,7 @@ function isSameType (a, b) {
 }
 
 function getTypeIndex (type, expectedTypes): number {
+  /* prop.tyoe 可以是原生构造函数或者任何构造函数的一个或多个组成的数组 */
   if (!Array.isArray(expectedTypes)) {
     return isSameType(expectedTypes, type) ? 0 : -1
   }
