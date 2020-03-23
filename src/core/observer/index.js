@@ -106,6 +106,8 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * Attempt to create an observer instance for a value,
  * returns the new observer if successfully observed,
  * or the existing observer if the value already has one.
+ * 
+ * 深度地，把对象或数组的所有成员都应用为响应式
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
   if (!isObject(value) || value instanceof VNode) {
@@ -131,6 +133,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
 
 /**
  * Define a reactive property on an Object.
+ * 把对象上的一个属性定义为响应式
  */
 export function defineReactive (
   obj: Object,
@@ -153,15 +156,22 @@ export function defineReactive (
     val = obj[key]
   }
 
+  /* 把属性值对象也应用为响应式 */
   let childOb = !shallow && observe(val)
+
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
+      /**
+       * Dep.target 存在时，表示当前有一个数据是观察者。该观察者依赖于 obj[key]，因此才会触发 getter
+       * 因此这个被观察者的 dep 收集了观察者
+       */
       if (Dep.target) {
         dep.depend()
         if (childOb) {
+          /* TODO childOb 更深一层的数据呢？ */
           childOb.dep.depend()
           if (Array.isArray(value)) {
             dependArray(value)

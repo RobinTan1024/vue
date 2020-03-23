@@ -22,7 +22,7 @@ export function initRender (vm: Component) {
   const options = vm.$options
   const parentVnode = vm.$vnode = options._parentVnode // the placeholder node in parent tree
   const renderContext = parentVnode && parentVnode.context
-  /* 把 children 转成 slot 数组 */
+  /* 获取组件的插槽内容对象 */
   vm.$slots = resolveSlots(options._renderChildren, renderContext)
   vm.$scopedSlots = emptyObject
   // bind the createElement fn to this instance
@@ -34,6 +34,10 @@ export function initRender (vm: Component) {
   // user-written render functions.
   vm.$createElement = (a, b, c, d) => createElement(vm, a, b, c, d, true)
 
+  /**
+   * $attrs & $listeners 暴露出来的目的是为了更方便地实现 HOC
+   * 定义为响应式属性的目的是 HOC 可以取到最新的值
+   */
   // $attrs & $listeners are exposed for easier HOC creation.
   // they need to be reactive so that HOCs using them are always updated
   const parentData = parentVnode && parentVnode.data

@@ -9,6 +9,11 @@ let uid = 0
 /**
  * A dep is an observable that can have multiple
  * directives subscribing to it.
+ * 
+ * 响应式数据是观察者模式的实现。被观察者存储着观察者的引用，当被观察者发生变更时，将主动告知观察者（一种松耦合）
+ * dep 是被观察者保存的观察者的引用集合
+ * 
+ * ps：发布订阅模式与观察者模式非常相似，区别在于发布者与订阅者是完全不耦合的，发布的消息是由第三方实现来推送给订阅者。
  */
 export default class Dep {
   static target: ?Watcher;
@@ -30,6 +35,7 @@ export default class Dep {
 
   depend () {
     if (Dep.target) {
+      /* 看起来是观察者收集了依赖，但实际上 addDep 的实现还是依赖于被观察者的 add/remove。本质上还是被观察者持有观察者的引用 */
       Dep.target.addDep(this)
     }
   }
