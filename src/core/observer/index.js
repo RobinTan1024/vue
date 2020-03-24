@@ -33,6 +33,9 @@ export function toggleObserving (value: boolean) {
  * object. Once attached, the observer converts the target
  * object's property keys into getter/setters that
  * collect dependencies and dispatch updates.
+ * 
+ * Observer 类会被附加在每个被观察的对象上。一旦附加了，被观察对象的 keys 会被应用为响应式的 getter/setter，它可以收集观察者和通知更新。
+ * TODO 因此 Observer 类中的 dep 有啥用呢？ defineReactive 中的 getter 依赖了 Observer 类的 dep 是为啥呢？
  */
 export class Observer {
   value: any;
@@ -156,7 +159,7 @@ export function defineReactive (
     val = obj[key]
   }
 
-  /* 把属性值对象也应用为响应式 */
+  /* 深层地，把属性值对象也应用为响应式 */
   let childOb = !shallow && observe(val)
 
   Object.defineProperty(obj, key, {
@@ -171,7 +174,7 @@ export function defineReactive (
       if (Dep.target) {
         dep.depend()
         if (childOb) {
-          /* TODO childOb 更深一层的数据呢？ */
+          /* TODO 不清楚这里的作用 */
           childOb.dep.depend()
           if (Array.isArray(value)) {
             dependArray(value)
