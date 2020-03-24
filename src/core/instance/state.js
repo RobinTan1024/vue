@@ -69,6 +69,7 @@ function initProps (vm: Component, propsOptions: Object) {
   // instead of dynamic object key enumeration.
   const keys = vm.$options._propKeys = []
   const isRoot = !vm.$parent
+  /* prop 是被观察者，收集依赖应当在观察者的 getter */
   // root instance props should be converted
   if (!isRoot) {
     toggleObserving(false)
@@ -103,6 +104,7 @@ function initProps (vm: Component, propsOptions: Object) {
       /* 在 validateProp 中 prop 的工厂函数返回的初始值已经具有数据订阅能力 */
       defineReactive(props, key, value)
     }
+    /* props 实际等于 vm._props，这里把 props 代理到 vm 上 */
     // static props are already proxied on the component's prototype
     // during Vue.extend(). We only need to proxy props defined at
     // instantiation here.

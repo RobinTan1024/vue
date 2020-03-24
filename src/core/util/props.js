@@ -88,7 +88,7 @@ function getPropDefaultValue (vm: ?Component, prop: PropOptions, key: string): a
       vm
     )
   }
-  /* TODO vm._props 定义与作用？？？ */
+  /* vm._props 就是 props 的键值对 */
   // the raw prop value was also undefined from previous render,
   // return previous default value to avoid unnecessary watcher trigger
   if (vm && vm.$options.propsData &&

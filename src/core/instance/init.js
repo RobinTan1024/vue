@@ -77,12 +77,19 @@ export function initMixin (Vue: Class<Component>) {
     /**
      * initRender 的作用
      * 1. 处理 slot 插槽内容（而非插槽的容器，插槽内容在父组件作用域中编译，插槽容器在子组件中定义位置）
-     * 2. 
+     * 2. 将 vm.$listeners 和 vm.$attrs 属性设置为响应式属性
      */
-    initRender(vm) // 处理 slot 插槽的内容，响应式 vm.$attrs 和 vm.$listeners
+    initRender(vm)
     callHook(vm, 'beforeCreate')
-    initInjections(vm) // resolve injections before data/props 翻译：在 data/props 前沿着组件树找到依赖注入
-    initState(vm) // 处理
+    /* 在初始化 data/props 前沿着组件树找到依赖注入 */
+    initInjections(vm) // resolve injections before data/props
+    /**
+     * initState 的作用
+     * 1. 对 props 进行了类型校验，初始化初值，设置响应式，代理到 vm 上
+     * 2. 直接设置 methods 在 vm 上（而非代理），设置 this = vm
+     * 3. 
+     */
+    initState(vm)
     initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
 
