@@ -135,6 +135,7 @@ function initData (vm: Component) {
   let i = keys.length
   while (i--) {
     const key = keys[i]
+    /* 如果 data 有与 methods 同名的属性，则警告，但不阻止 data 覆盖 methods */
     if (process.env.NODE_ENV !== 'production') {
       if (methods && hasOwn(methods, key)) {
         warn(
@@ -143,6 +144,7 @@ function initData (vm: Component) {
         )
       }
     }
+    /* props 和 data 的同名检测，不允许同名覆盖 */
     if (props && hasOwn(props, key)) {
       process.env.NODE_ENV !== 'production' && warn(
         `The data property "${key}" is already declared as a prop. ` +
@@ -150,9 +152,14 @@ function initData (vm: Component) {
         vm
       )
     } else if (!isReserved(key)) {
+      /**
+       * 把 data 属性代理在 vm 上
+       * _data 属性是 data 的键值对对象
+       */
       proxy(vm, `_data`, key)
     }
   }
+  /* 应用为响应式对象 */
   // observe data
   observe(data, true /* asRootData */)
 }
@@ -173,6 +180,7 @@ export function getData (data: Function, vm: Component): any {
 const computedWatcherOptions = { lazy: true }
 
 function initComputed (vm: Component, computed: Object) {
+  /* vm._computedWatchers 是存储计算属性的对象 */
   // $flow-disable-line
   const watchers = vm._computedWatchers = Object.create(null)
   // computed properties are just getters during SSR
@@ -218,6 +226,7 @@ export function defineComputed (
   key: string,
   userDef: Object | Function
 ) {
+  /* 缓存计算属性结果，依赖变更才会重新计算 */
   const shouldCache = !isServerRendering()
   if (typeof userDef === 'function') {
     sharedPropertyDefinition.get = shouldCache
@@ -251,6 +260,7 @@ function createComputedGetter (key) {
       if (watcher.dirty) {
         watcher.evaluate()
       }
+      /* TODO 什么情况下会出现？ */
       if (Dep.target) {
         watcher.depend()
       }

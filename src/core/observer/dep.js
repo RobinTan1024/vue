@@ -44,6 +44,14 @@ export default class Dep {
     // stabilize the subscriber list first
     const subs = this.subs.slice()
     if (process.env.NODE_ENV !== 'production' && !config.async) {
+      /**
+       * 排序是为了确保观察者能够按顺序更新
+       * 因为被观察者是 props/data ，而观察者是 computed/watch ，并且 watch 也可以侦听 computed
+       * 这就要求在 watch 更新前，computed 先完成更新
+       * 由于在组件初始化时，是按照 computed > watch 的顺序初始化的，每个 Watcher 都有一个递增的 id
+       * 下方排序的 id 就是 watcher.id，因此 watch 的 id 一定比 computed 的大
+       * 因此可以根据大小来按顺序把被观察者的改动通知观察者
+       */
       // subs aren't sorted in scheduler if not running async
       // we need to sort them now to make sure they fire in correct
       // order
@@ -61,6 +69,7 @@ export default class Dep {
 Dep.target = null
 const targetStack = []
 
+/* 表示当前有观察者，要触发被观察者的 getter 并收集依赖 */
 export function pushTarget (target: ?Watcher) {
   targetStack.push(target)
   Dep.target = target

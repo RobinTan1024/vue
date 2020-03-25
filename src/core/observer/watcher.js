@@ -22,6 +22,10 @@ let uid = 0
  * A watcher parses an expression, collects dependencies,
  * and fires callback when the expression value changes.
  * This is used for both the $watch() api and directives.
+ * 
+ * 在响应式数据的实现模式是观察者模式，Watcher 正是观察者的实现。而通过 defineReactive 设置了 setter/getter 的对象属性则是被观察者
+ * Watcher 可以编译表达式，收集依赖并且在表达式值变化时触发回调
+ * 用于 $watch api 和指令
  */
 export default class Watcher {
   vm: Component;
@@ -32,7 +36,7 @@ export default class Watcher {
   user: boolean;
   lazy: boolean;
   sync: boolean;
-  dirty: boolean;
+  dirty: boolean; // 是否脏检测。
   active: boolean;
   deps: Array<Dep>;
   newDeps: Array<Dep>;
@@ -50,6 +54,7 @@ export default class Watcher {
     isRenderWatcher?: boolean
   ) {
     this.vm = vm
+    /* vm._watcher 属性的定义之处 */
     if (isRenderWatcher) {
       vm._watcher = this
     }
@@ -75,6 +80,10 @@ export default class Watcher {
     this.expression = process.env.NODE_ENV !== 'production'
       ? expOrFn.toString()
       : ''
+    /**
+     * 在 Vue.prototype.$watch 中，监听对象 expOrFn 可以是
+     * 1. 函数。当 watcher 被取值时，
+     */
     // parse expression for getter
     if (typeof expOrFn === 'function') {
       this.getter = expOrFn
@@ -97,12 +106,16 @@ export default class Watcher {
 
   /**
    * Evaluate the getter, and re-collect dependencies.
+   * 
+   * 执行 getter，并且重新收集依赖
    */
   get () {
+    /* 表示当前有观察者，要触发被观察者的 getter 并收集依赖 */
     pushTarget(this)
     let value
     const vm = this.vm
     try {
+      /* 当 getter 执行时，所有被访问的响应式属性都会收集到观察者的 */
       value = this.getter.call(vm, vm)
     } catch (e) {
       if (this.user) {
@@ -113,10 +126,12 @@ export default class Watcher {
     } finally {
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
+      /* 如果是深度监听，还需要深入到对象中每一个属性来触发 getter 以收集依赖 */
       if (this.deep) {
         traverse(value)
       }
       popTarget()
+      /* 更新新旧依赖 */
       this.cleanupDeps()
     }
     return value

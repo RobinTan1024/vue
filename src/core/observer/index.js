@@ -111,6 +111,7 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * or the existing observer if the value already has one.
  * 
  * 深度地，把对象或数组的所有成员都应用为响应式
+ * asRootData 为真时，代表 value 为 vm 或者 vm.$data，不允许通过 Vue.set/Vue.delete 来增删属性
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
   if (!isObject(value) || value instanceof VNode) {

@@ -87,7 +87,9 @@ export function initMixin (Vue: Class<Component>) {
      * initState 的作用
      * 1. 对 props 进行了类型校验，初始化初值，设置响应式，代理到 vm 上
      * 2. 直接设置 methods 在 vm 上（而非代理），设置 this = vm
-     * 3. 
+     * 3. 初始化 data 初值，与 props/methods 同名冲突检测，代理到 vm，应用为响应式数据
+     * 4. 将 computed 属性设置为观察者对象，依赖收集
+     * 5. 将 watch 属性设置为观察者对象，依赖收集
      */
     initState(vm)
     initProvide(vm) // resolve provide after data/props
