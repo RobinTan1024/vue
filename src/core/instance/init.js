@@ -92,6 +92,7 @@ export function initMixin (Vue: Class<Component>) {
      * 5. 将 watch 属性设置为观察者对象
      */
     initState(vm)
+    /* 初始化注入 provide */
     initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
 
