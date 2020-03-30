@@ -14,6 +14,7 @@ export function initProvide (vm: Component) {
 }
 
 export function initInjections (vm: Component) {
+  /* 获取各个 inject 的值 */
   const result = resolveInject(vm.$options.inject, vm)
   if (result) {
     toggleObserving(false)
@@ -44,7 +45,7 @@ export function resolveInject (inject: any, vm: Component): ?Object {
       ? Reflect.ownKeys(inject)
       : Object.keys(inject)
 
-    /* 沿着组件树向上查找 provide injection 的源头 */
+    /* 沿着组件树向上查找 inject 各个注入依赖的源头和值 */
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i]
       // #6574 in case the inject object is observed...
