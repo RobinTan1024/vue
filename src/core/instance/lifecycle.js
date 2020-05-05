@@ -167,6 +167,8 @@ export function mountComponent (
   }
   callHook(vm, 'beforeMount')
 
+  // vm._render() 是生成了 vnode 虚拟节点
+  // vm._update() 是把 VNode patch 到真实 DOM
   let updateComponent
   /* istanbul ignore if */
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
@@ -204,6 +206,9 @@ export function mountComponent (
   }, true /* isRenderWatcher */)
   hydrating = false
 
+  // 直到此处，vm._update 和 vm._render 都没有被立即调用，等于没有生成 vnode 和更新到真实 DOM
+  // vm.$vnode == null 表示这不是一个组件的渲染过程，而是 new Vue 的初始化过程
+  // 对于组件，它的 mounted 在....
   // manually mounted instance, call mounted on self
   // mounted is called for render-created child components in its inserted hook
   if (vm.$vnode == null) {
